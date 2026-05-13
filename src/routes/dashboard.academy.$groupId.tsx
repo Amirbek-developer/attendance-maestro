@@ -83,6 +83,7 @@ function GroupDetail() {
         <Link to="/dashboard/academy" search={{ tab: "groups" }} className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"><ArrowLeft className="h-4 w-4" /></Link>
         <h1 className="text-2xl font-bold">{group?.name || "—"}</h1>
         <span className="text-sm text-muted-foreground">{t("group.studentsCount", { count: students.length })}</span>
+        <div className="ml-auto"><AddStudentDialog groupId={groupId} /></div>
       </div>
 
       <Tabs defaultValue="daily">
