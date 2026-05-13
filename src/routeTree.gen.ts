@@ -19,6 +19,7 @@ import { Route as DashboardRatingRouteImport } from './routes/dashboard.rating'
 import { Route as DashboardExamsRouteImport } from './routes/dashboard.exams'
 import { Route as DashboardAiRouteImport } from './routes/dashboard.ai'
 import { Route as DashboardAcademyRouteImport } from './routes/dashboard.academy'
+import { Route as DashboardAcademyIndexRouteImport } from './routes/dashboard.academy.index'
 import { Route as DashboardAcademyGroupIdRouteImport } from './routes/dashboard.academy.$groupId'
 
 const DashboardRoute = DashboardRouteImport.update({
@@ -71,6 +72,11 @@ const DashboardAcademyRoute = DashboardAcademyRouteImport.update({
   path: '/academy',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardAcademyIndexRoute = DashboardAcademyIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardAcademyRoute,
+} as any)
 const DashboardAcademyGroupIdRoute = DashboardAcademyGroupIdRouteImport.update({
   id: '/$groupId',
   path: '/$groupId',
@@ -89,11 +95,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/system': typeof DashboardSystemRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/academy/': typeof DashboardAcademyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/dashboard/academy': typeof DashboardAcademyRouteWithChildren
   '/dashboard/ai': typeof DashboardAiRoute
   '/dashboard/exams': typeof DashboardExamsRoute
   '/dashboard/rating': typeof DashboardRatingRoute
@@ -101,6 +107,7 @@ export interface FileRoutesByTo {
   '/dashboard/system': typeof DashboardSystemRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/academy': typeof DashboardAcademyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +122,7 @@ export interface FileRoutesById {
   '/dashboard/system': typeof DashboardSystemRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/academy/': typeof DashboardAcademyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,11 +138,11 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard/'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/academy/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/dashboard/academy'
     | '/dashboard/ai'
     | '/dashboard/exams'
     | '/dashboard/rating'
@@ -142,6 +150,7 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/academy'
   id:
     | '__root__'
     | '/'
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard/'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/academy/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -235,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAcademyRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/academy/': {
+      id: '/dashboard/academy/'
+      path: '/'
+      fullPath: '/dashboard/academy/'
+      preLoaderRoute: typeof DashboardAcademyIndexRouteImport
+      parentRoute: typeof DashboardAcademyRoute
+    }
     '/dashboard/academy/$groupId': {
       id: '/dashboard/academy/$groupId'
       path: '/$groupId'
@@ -247,10 +264,12 @@ declare module '@tanstack/react-router' {
 
 interface DashboardAcademyRouteChildren {
   DashboardAcademyGroupIdRoute: typeof DashboardAcademyGroupIdRoute
+  DashboardAcademyIndexRoute: typeof DashboardAcademyIndexRoute
 }
 
 const DashboardAcademyRouteChildren: DashboardAcademyRouteChildren = {
   DashboardAcademyGroupIdRoute: DashboardAcademyGroupIdRoute,
+  DashboardAcademyIndexRoute: DashboardAcademyIndexRoute,
 }
 
 const DashboardAcademyRouteWithChildren =
