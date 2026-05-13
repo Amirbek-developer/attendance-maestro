@@ -117,7 +117,7 @@ function GroupDetail() {
                         <td className="p-3">
                           <button
                             onClick={() => setStatus.mutate({ studentId: s.id, status: nextStatus(s.today || "unknown") })}
-                            className={cn("inline-flex items-center justify-center h-7 px-3 rounded-md border text-xs font-bold", STATUS_STYLES[s.today || "unknown"].bg, STATUS_STYLES[s.today || "unknown"].text)}
+                            className={cn("inline-flex items-center justify-center h-7 px-3 rounded-md border text-xs font-bold", STATUS_STYLES[(s.today || "unknown") as keyof typeof STATUS_STYLES].bg, STATUS_STYLES[(s.today || "unknown") as keyof typeof STATUS_STYLES].text)}
                           >
                             {t(`attendance.${s.today || "unknown"}`)}
                           </button>
