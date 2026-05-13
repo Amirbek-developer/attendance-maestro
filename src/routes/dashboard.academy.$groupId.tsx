@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { STATUS_POINTS, STATUS_STYLES, nextStatus, fmtDate, type AttendanceStatus } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
@@ -75,6 +76,12 @@ function GroupDetail() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["group-students", groupId] }); toast.success(t("common.success")); },
   });
 
+  const delStudent = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("students").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["group-students", groupId] }); qc.invalidateQueries({ queryKey: ["students-all"] }); qc.invalidateQueries({ queryKey: ["groups"] }); toast.success(t("common.success")); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const ranked = [...enriched].sort((a, b) => b.score - a.score);
 
   return (
@@ -126,7 +133,23 @@ function GroupDetail() {
                         </td>
                         <td className="p-3"><RewardCell studentId={s.id} groupId={groupId} sum={s.rewardSum} /></td>
                         <td className={"p-3 font-bold " + (s.score < 0 ? "text-destructive" : "text-success")}>{s.score.toFixed(1)}</td>
-                        <td className="p-3"></td>
+                        <td className="p-3 text-right">
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button className="h-7 w-7 inline-flex items-center justify-center rounded text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>{t("common.confirm")}</AlertDialogTitle>
+                                <AlertDialogDescription>{t("students.confirmDelete")} — {s.full_name}</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => delStudent.mutate(s.id)} className="bg-destructive text-destructive-foreground">{t("common.delete")}</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
