@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { STATUS_POINTS, STATUS_STYLES, nextStatus, fmtDate, type AttendanceStatus } from "@/lib/scoring";
 import { cn } from "@/lib/utils";
@@ -82,6 +83,7 @@ function GroupDetail() {
         <Link to="/dashboard/academy" search={{ tab: "groups" }} className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted"><ArrowLeft className="h-4 w-4" /></Link>
         <h1 className="text-2xl font-bold">{group?.name || "—"}</h1>
         <span className="text-sm text-muted-foreground">{t("group.studentsCount", { count: students.length })}</span>
+        <div className="ml-auto"><AddStudentDialog groupId={groupId} /></div>
       </div>
 
       <Tabs defaultValue="daily">
@@ -250,6 +252,54 @@ function RewardCell({ studentId, groupId, sum }: { studentId: string; groupId: s
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
           <Button onClick={() => submit.mutate()} disabled={submit.isPending}>{t("common.save")}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AddStudentDialog({ groupId }: { groupId: string }) {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [open, setOpen] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [notes, setNotes] = React.useState("");
+
+  const create = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("students").insert({
+        full_name: name.trim(), phone: phone.trim() || null, notes: notes.trim() || null,
+        group_id: groupId, user_id: user!.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["group-students", groupId] });
+      qc.invalidateQueries({ queryKey: ["students-all"] });
+      qc.invalidateQueries({ queryKey: ["groups"] });
+      setOpen(false); setName(""); setPhone(""); setNotes("");
+      toast.success(t("common.success"));
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="rounded-full gap-1.5"><UserPlus className="h-4 w-4" /> {t("students.addStudent")}</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{t("students.addTitle")}</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div><Label>{t("students.nameLabel")}</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("students.namePh")} autoFocus /></div>
+          <div><Label>{t("students.phoneLabel")}</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+          <div><Label>{t("students.notesLabel")}</Label><Textarea value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
+          <Button disabled={!name.trim() || create.isPending} onClick={() => create.mutate()}>{t("common.save")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
