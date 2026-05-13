@@ -76,6 +76,12 @@ function GroupDetail() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["group-students", groupId] }); toast.success(t("common.success")); },
   });
 
+  const delStudent = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("students").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["group-students", groupId] }); qc.invalidateQueries({ queryKey: ["students-all"] }); qc.invalidateQueries({ queryKey: ["groups"] }); toast.success(t("common.success")); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const ranked = [...enriched].sort((a, b) => b.score - a.score);
 
   return (
