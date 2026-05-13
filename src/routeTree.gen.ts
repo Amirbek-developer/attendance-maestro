@@ -9,38 +9,176 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardSystemRouteImport } from './routes/dashboard.system'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
+import { Route as DashboardRatingRouteImport } from './routes/dashboard.rating'
+import { Route as DashboardExamsRouteImport } from './routes/dashboard.exams'
+import { Route as DashboardAiRouteImport } from './routes/dashboard.ai'
+import { Route as DashboardAcademyRouteImport } from './routes/dashboard.academy'
+import { Route as DashboardAcademyGroupIdRouteImport } from './routes/dashboard.academy.$groupId'
 
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSystemRoute = DashboardSystemRouteImport.update({
+  id: '/system',
+  path: '/system',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardRatingRoute = DashboardRatingRouteImport.update({
+  id: '/rating',
+  path: '/rating',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardExamsRoute = DashboardExamsRouteImport.update({
+  id: '/exams',
+  path: '/exams',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAiRoute = DashboardAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAcademyRoute = DashboardAcademyRouteImport.update({
+  id: '/academy',
+  path: '/academy',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAcademyGroupIdRoute = DashboardAcademyGroupIdRouteImport.update({
+  id: '/$groupId',
+  path: '/$groupId',
+  getParentRoute: () => DashboardAcademyRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/academy': typeof DashboardAcademyRouteWithChildren
+  '/dashboard/ai': typeof DashboardAiRoute
+  '/dashboard/exams': typeof DashboardExamsRoute
+  '/dashboard/rating': typeof DashboardRatingRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/system': typeof DashboardSystemRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard/academy': typeof DashboardAcademyRouteWithChildren
+  '/dashboard/ai': typeof DashboardAiRoute
+  '/dashboard/exams': typeof DashboardExamsRoute
+  '/dashboard/rating': typeof DashboardRatingRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/system': typeof DashboardSystemRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/academy': typeof DashboardAcademyRouteWithChildren
+  '/dashboard/ai': typeof DashboardAiRoute
+  '/dashboard/exams': typeof DashboardExamsRoute
+  '/dashboard/rating': typeof DashboardRatingRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/system': typeof DashboardSystemRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/dashboard/academy'
+    | '/dashboard/ai'
+    | '/dashboard/exams'
+    | '/dashboard/rating'
+    | '/dashboard/settings'
+    | '/dashboard/system'
+    | '/dashboard/'
+    | '/dashboard/academy/$groupId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard/academy'
+    | '/dashboard/ai'
+    | '/dashboard/exams'
+    | '/dashboard/rating'
+    | '/dashboard/settings'
+    | '/dashboard/system'
+    | '/dashboard'
+    | '/dashboard/academy/$groupId'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/dashboard/academy'
+    | '/dashboard/ai'
+    | '/dashboard/exams'
+    | '/dashboard/rating'
+    | '/dashboard/settings'
+    | '/dashboard/system'
+    | '/dashboard/'
+    | '/dashboard/academy/$groupId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +186,105 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/system': {
+      id: '/dashboard/system'
+      path: '/system'
+      fullPath: '/dashboard/system'
+      preLoaderRoute: typeof DashboardSystemRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/rating': {
+      id: '/dashboard/rating'
+      path: '/rating'
+      fullPath: '/dashboard/rating'
+      preLoaderRoute: typeof DashboardRatingRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/exams': {
+      id: '/dashboard/exams'
+      path: '/exams'
+      fullPath: '/dashboard/exams'
+      preLoaderRoute: typeof DashboardExamsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/ai': {
+      id: '/dashboard/ai'
+      path: '/ai'
+      fullPath: '/dashboard/ai'
+      preLoaderRoute: typeof DashboardAiRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/academy': {
+      id: '/dashboard/academy'
+      path: '/academy'
+      fullPath: '/dashboard/academy'
+      preLoaderRoute: typeof DashboardAcademyRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/academy/$groupId': {
+      id: '/dashboard/academy/$groupId'
+      path: '/$groupId'
+      fullPath: '/dashboard/academy/$groupId'
+      preLoaderRoute: typeof DashboardAcademyGroupIdRouteImport
+      parentRoute: typeof DashboardAcademyRoute
+    }
   }
 }
 
+interface DashboardAcademyRouteChildren {
+  DashboardAcademyGroupIdRoute: typeof DashboardAcademyGroupIdRoute
+}
+
+const DashboardAcademyRouteChildren: DashboardAcademyRouteChildren = {
+  DashboardAcademyGroupIdRoute: DashboardAcademyGroupIdRoute,
+}
+
+const DashboardAcademyRouteWithChildren =
+  DashboardAcademyRoute._addFileChildren(DashboardAcademyRouteChildren)
+
+interface DashboardRouteChildren {
+  DashboardAcademyRoute: typeof DashboardAcademyRouteWithChildren
+  DashboardAiRoute: typeof DashboardAiRoute
+  DashboardExamsRoute: typeof DashboardExamsRoute
+  DashboardRatingRoute: typeof DashboardRatingRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardSystemRoute: typeof DashboardSystemRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAcademyRoute: DashboardAcademyRouteWithChildren,
+  DashboardAiRoute: DashboardAiRoute,
+  DashboardExamsRoute: DashboardExamsRoute,
+  DashboardRatingRoute: DashboardRatingRoute,
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSystemRoute: DashboardSystemRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
