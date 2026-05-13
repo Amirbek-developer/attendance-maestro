@@ -257,3 +257,51 @@ function RewardCell({ studentId, groupId, sum }: { studentId: string; groupId: s
     </Dialog>
   );
 }
+
+function AddStudentDialog({ groupId }: { groupId: string }) {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [open, setOpen] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [notes, setNotes] = React.useState("");
+
+  const create = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("students").insert({
+        full_name: name.trim(), phone: phone.trim() || null, notes: notes.trim() || null,
+        group_id: groupId, user_id: user!.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["group-students", groupId] });
+      qc.invalidateQueries({ queryKey: ["students-all"] });
+      qc.invalidateQueries({ queryKey: ["groups"] });
+      setOpen(false); setName(""); setPhone(""); setNotes("");
+      toast.success(t("common.success"));
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="rounded-full gap-1.5"><UserPlus className="h-4 w-4" /> {t("students.addStudent")}</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{t("students.addTitle")}</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div><Label>{t("students.nameLabel")}</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("students.namePh")} autoFocus /></div>
+          <div><Label>{t("students.phoneLabel")}</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+          <div><Label>{t("students.notesLabel")}</Label><Textarea value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
+          <Button disabled={!name.trim() || create.isPending} onClick={() => create.mutate()}>{t("common.save")}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
