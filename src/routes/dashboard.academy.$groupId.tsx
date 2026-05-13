@@ -133,7 +133,23 @@ function GroupDetail() {
                         </td>
                         <td className="p-3"><RewardCell studentId={s.id} groupId={groupId} sum={s.rewardSum} /></td>
                         <td className={"p-3 font-bold " + (s.score < 0 ? "text-destructive" : "text-success")}>{s.score.toFixed(1)}</td>
-                        <td className="p-3"></td>
+                        <td className="p-3 text-right">
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button className="h-7 w-7 inline-flex items-center justify-center rounded text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>{t("common.confirm")}</AlertDialogTitle>
+                                <AlertDialogDescription>{t("students.confirmDelete")} — {s.full_name}</AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => delStudent.mutate(s.id)} className="bg-destructive text-destructive-foreground">{t("common.delete")}</AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
