@@ -187,10 +187,11 @@ const resources = {
         buy: "Sotib olish",
       },
       attendance: {
-        present: "Kelgan", late: "Kech kelgan", absent: "Kelmadi", unknown: "—",
+        present: "Kelgan", late: "Kech kelgan", absent: "Kelmadi", excused: "Sababli", unknown: "Belgilash",
         addReward: "Mukofot qo'shish", addPenalty: "Jarima qo'shish",
         points: "Ball", reason: "Sabab", reasonPh: "Mukofot/jarima sababi",
       },
+      lang: { uz: "O'zbekcha", ru: "Русский", en: "English" },
     },
   },
   ru: {
