@@ -1,4 +1,3 @@
-import * as React from "react";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Archive, Database } from "lucide-react";
@@ -15,13 +14,13 @@ function SystemLayout() {
     { to: "/dashboard/system/archive", icon: Archive, label: t("system.archive") },
     { to: "/dashboard/system/data", icon: Database, label: t("system.data") },
   ];
-  // Default to archive when on /dashboard/system
   const isExact = path === "/dashboard/system" || path === "/dashboard/system/";
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
         {tabs.map((tab) => {
-          const active = isExact ? tab.to.endsWith("/archive") : path.startsWith(tab.to);
+          const active = (isExact && tab.to.endsWith("/archive")) || path.startsWith(tab.to);
           return (
             <Link
               key={tab.to}
@@ -39,20 +38,7 @@ function SystemLayout() {
           );
         })}
       </div>
-      <SystemContent isExact={isExact} />
+      <Outlet />
     </div>
   );
-}
-
-function SystemContent({ isExact }: { isExact: boolean }) {
-  // Render the default (archive) when on the bare /dashboard/system path
-  if (isExact) {
-    const ArchiveLazy = React.lazy(() => import("@/components/system/archive-view").then((m) => ({ default: m.ArchiveView })));
-    return (
-      <React.Suspense fallback={<div className="text-sm text-muted-foreground p-8 text-center">…</div>}>
-        <ArchiveLazy />
-      </React.Suspense>
-    );
-  }
-  return <Outlet />;
 }
