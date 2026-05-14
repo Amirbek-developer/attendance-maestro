@@ -320,10 +320,11 @@ const resources = {
         daysLeft: "ДЕМО РЕЖИМ: ОСТАЛОСЬ {{n}} ДНЕЙ", buy: "Купить",
       },
       attendance: {
-        present: "Пришёл", late: "Опоздал", absent: "Не пришёл", unknown: "—",
+        present: "Пришёл", late: "Опоздал", absent: "Не пришёл", excused: "Уваж.", unknown: "Отметить",
         addReward: "Добавить награду", addPenalty: "Добавить штраф",
         points: "Баллы", reason: "Причина", reasonPh: "Причина награды/штрафа",
       },
+      lang: { uz: "O'zbekcha", ru: "Русский", en: "English" },
     },
   },
   en: {
