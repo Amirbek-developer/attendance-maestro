@@ -2,7 +2,7 @@ import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Plus, Check, RotateCcw, Calendar, FileText, Trophy, Award, Minus } from "lucide-react";
+import { ArrowLeft, Plus, Check, RotateCcw, Calendar, FileText, Trophy, Award, Minus, Clock, X, AlertTriangle, Circle, MoreVertical, Medal } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { UserPlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -20,6 +21,14 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/dashboard/academy/$groupId")({
   component: GroupDetail,
 });
+
+const STATUS_ICONS: Record<AttendanceStatus, React.ComponentType<{ className?: string }>> = {
+  present: Check,
+  late: Clock,
+  absent: X,
+  excused: AlertTriangle,
+  unknown: Circle,
+};
 
 function GroupDetail() {
   const { t } = useTranslation();
@@ -39,10 +48,11 @@ function GroupDetail() {
 
   const enriched = students.map((s: any) => {
     const todayRec = (s.attendance_records || []).find((r: any) => r.date === date);
-    const score = (s.attendance_records || []).reduce((a: number, r: any) => a + (STATUS_POINTS[r.status as AttendanceStatus] || 0), 0)
-      + (s.reward_records || []).reduce((a: number, r: any) => a + Number(r.points), 0);
-    const rewardSum = (s.reward_records || []).reduce((a: number, r: any) => a + Number(r.points), 0);
-    return { ...s, today: todayRec?.status as AttendanceStatus | undefined, score, rewardSum };
+    const attScore = (s.attendance_records || []).reduce((a: number, r: any) => a + (STATUS_POINTS[r.status as AttendanceStatus] || 0), 0);
+    const rewardSum = (s.reward_records || []).reduce((a: number, r: any) => a + Math.max(0, Number(r.points)), 0);
+    const penaltySum = (s.reward_records || []).reduce((a: number, r: any) => a + Math.min(0, Number(r.points)), 0);
+    const score = attScore + rewardSum + penaltySum;
+    return { ...s, today: todayRec?.status as AttendanceStatus | undefined, score, attScore, rewardSum, penaltySum };
   });
 
   const allDates = React.useMemo(() => {
@@ -83,6 +93,7 @@ function GroupDetail() {
   });
 
   const ranked = [...enriched].sort((a, b) => b.score - a.score);
+  const todayNotesCount = enriched.filter((s: any) => s.today === "excused").length;
 
   return (
     <div className="space-y-4">
@@ -107,48 +118,78 @@ function GroupDetail() {
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                   <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="bg-transparent outline-none" />
                 </div>
-                <Button size="sm" variant="outline" className="border-warning/40 text-warning gap-1.5"><FileText className="h-3.5 w-3.5" />{t("group.addNote")}</Button>
-                <Button size="sm" variant="outline" className="border-success/40 text-success gap-1.5" onClick={() => markAll.mutate("present")}><Check className="h-3.5 w-3.5" />{t("group.markAllPresent")}</Button>
-                <Button size="sm" variant="outline" className="border-destructive/40 text-destructive gap-1.5" onClick={() => clearDay.mutate()}><RotateCcw className="h-3.5 w-3.5" />{t("group.clear")}</Button>
+                <Button size="sm" variant="outline" className="border-warning/40 text-warning gap-1.5">
+                  <FileText className="h-3.5 w-3.5" />{t("group.notes")} ({todayNotesCount})
+                </Button>
+                <Button size="sm" variant="outline" className="border-success/40 text-success gap-1.5" onClick={() => markAll.mutate("present")}>
+                  <Check className="h-3.5 w-3.5" />{t("group.allPresent")}
+                </Button>
+                <Button size="sm" variant="outline" className="border-destructive/40 text-destructive gap-1.5" onClick={() => clearDay.mutate()}>
+                  <RotateCcw className="h-3.5 w-3.5" />{t("group.clear")}
+                </Button>
               </div>
               {students.length === 0 ? (
                 <div className="p-10 text-center text-sm text-muted-foreground">{t("group.emptyStudents")}</div>
               ) : (
                 <table className="w-full text-sm">
                   <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-                    <tr><th className="p-3 text-left w-10">#</th><th className="p-3 text-left">{t("group.student")}</th><th className="p-3 text-left">{t("group.attendance")}</th><th className="p-3 text-left">{t("group.rewardFine")}</th><th className="p-3 text-left">{t("group.totalScore")}</th><th className="p-3"></th></tr>
+                    <tr>
+                      <th className="p-3 text-left w-10">#</th>
+                      <th className="p-3 text-left">{t("group.student")}</th>
+                      <th className="p-3 text-center">{t("group.attendance")}</th>
+                      <th className="p-3 text-center">{t("group.rewardFine")}</th>
+                      <th className="p-3 text-center">{t("group.totalScore")}</th>
+                      <th className="p-3 w-10">{t("group.actions")}</th>
+                    </tr>
                   </thead>
                   <tbody>
                     {enriched.map((s: any, i: number) => (
                       <tr key={s.id} className="border-t hover:bg-muted/20">
                         <td className="p-3 text-muted-foreground">{i + 1}</td>
-                        <td className="p-3 font-semibold">{s.full_name}</td>
                         <td className="p-3">
-                          <button
-                            onClick={() => setStatus.mutate({ studentId: s.id, status: nextStatus(s.today || "unknown") })}
-                            className={cn("inline-flex items-center justify-center h-7 px-3 rounded-md border text-xs font-bold", STATUS_STYLES[(s.today || "unknown") as keyof typeof STATUS_STYLES].bg, STATUS_STYLES[(s.today || "unknown") as keyof typeof STATUS_STYLES].text)}
-                          >
-                            {t(`attendance.${s.today || "unknown"}`)}
-                          </button>
+                          <div className="font-semibold">{s.full_name}</div>
+                          <div className="text-xs text-muted-foreground">ID yo'q</div>
                         </td>
-                        <td className="p-3"><RewardCell studentId={s.id} groupId={groupId} sum={s.rewardSum} /></td>
-                        <td className={"p-3 font-bold " + (s.score < 0 ? "text-destructive" : "text-success")}>{s.score.toFixed(1)}</td>
-                        <td className="p-3 text-right">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <button className="h-7 w-7 inline-flex items-center justify-center rounded text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>{t("common.confirm")}</AlertDialogTitle>
-                                <AlertDialogDescription>{t("students.confirmDelete")} — {s.full_name}</AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => delStudent.mutate(s.id)} className="bg-destructive text-destructive-foreground">{t("common.delete")}</AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                        <td className="p-3 text-center">
+                          <AttendanceButton
+                            status={(s.today || "unknown") as AttendanceStatus}
+                            onClick={() => setStatus.mutate({ studentId: s.id, status: nextStatus(s.today || "unknown") })}
+                            label={t(`attendance.${s.today || "unknown"}`)}
+                          />
+                        </td>
+                        <td className="p-3">
+                          <RewardPair studentId={s.id} groupId={groupId} rewardSum={s.rewardSum} penaltySum={s.penaltySum} />
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className={cn("inline-flex items-center justify-center min-w-14 h-7 px-3 rounded-full text-xs font-bold", s.score >= 0 ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive")}>
+                            {s.score.toFixed(1)}
+                          </span>
+                        </td>
+                        <td className="p-3">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button className="h-7 w-7 inline-flex items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"><MoreVertical className="h-4 w-4" /></button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
+                                    <Trash2 className="h-3.5 w-3.5 mr-2" /> {t("common.delete")}
+                                  </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>{t("common.confirm")}</AlertDialogTitle>
+                                    <AlertDialogDescription>{t("students.confirmDelete")} — {s.full_name}</AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => delStudent.mutate(s.id)} className="bg-destructive text-destructive-foreground">{t("common.delete")}</AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </td>
                       </tr>
                     ))}
@@ -157,20 +198,14 @@ function GroupDetail() {
               )}
             </div>
 
-            <div className="rounded-xl border bg-card shadow-soft">
+            <div className="rounded-xl border bg-card shadow-soft self-start">
               <div className="px-4 py-3 border-b flex items-center justify-between">
                 <h3 className="text-sm font-semibold">{t("group.classRating")}</h3>
-                <span className="text-xs text-muted-foreground">{students.length} {t("group.studentsCount", { count: students.length }).split(" ")[1]}</span>
+                <span className="text-xs text-muted-foreground">{t("group.studentsCount", { count: students.length })}</span>
               </div>
-              <div className="p-3 space-y-1.5 max-h-[480px] overflow-y-auto">
+              <div className="p-2 space-y-1 max-h-[640px] overflow-y-auto">
                 {ranked.length === 0 ? <p className="text-sm text-muted-foreground text-center py-8">{t("group.noData")}</p> :
-                  ranked.map((s: any, i: number) => (
-                    <div key={s.id} className="flex items-center gap-3 rounded-md p-2 hover:bg-muted/40">
-                      <span className="text-xs font-bold text-muted-foreground w-5">{i + 1}</span>
-                      <span className="flex-1 text-sm truncate">{s.full_name}</span>
-                      <span className={cn("inline-flex items-center justify-center min-w-12 h-7 px-2 rounded-full text-xs font-bold", s.score >= 0 ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive")}>{s.score.toFixed(1)}</span>
-                    </div>
-                  ))}
+                  ranked.map((s: any, i: number) => <RatingRow key={s.id} rank={i + 1} student={s} />)}
               </div>
             </div>
           </div>
@@ -206,7 +241,7 @@ function GroupDetail() {
                           {allDates.map((d) => {
                             const r = recs.find((x: any) => x.date === d);
                             const st = (r?.status || "unknown") as AttendanceStatus;
-                            return <td key={d} className="p-0.5"><div className={cn("h-7 w-7 rounded border inline-flex items-center justify-center font-bold", STATUS_STYLES[st].bg, STATUS_STYLES[st].text)}>{STATUS_STYLES[st].symbol}</div></td>;
+                            return <td key={d} className="p-0.5"><div className={cn("h-7 w-7 rounded inline-flex items-center justify-center font-bold", STATUS_STYLES[st].bg, STATUS_STYLES[st].text)}>{STATUS_STYLES[st].symbol}</div></td>;
                           })}
                         </tr>
                       );
@@ -223,28 +258,94 @@ function GroupDetail() {
   );
 }
 
-function Legend() {
-  const { t } = useTranslation();
+function AttendanceButton({ status, onClick, label }: { status: AttendanceStatus; onClick: () => void; label: string }) {
+  const Icon = STATUS_ICONS[status];
+  const styles = STATUS_STYLES[status];
+  if (status === "unknown") {
+    return (
+      <button onClick={onClick} className="inline-flex flex-col items-center gap-0.5 group">
+        <span className="h-9 w-9 rounded-md border-2 border-dashed border-border bg-muted/40 inline-flex items-center justify-center text-muted-foreground group-hover:border-info group-hover:text-info transition-colors">
+          <Icon className="h-4 w-4" />
+        </span>
+        <span className="text-[10px] text-muted-foreground">{label}</span>
+      </button>
+    );
+  }
   return (
-    <div className="mt-4 flex flex-wrap gap-3 text-xs">
-      {(["present","late","absent","unknown"] as AttendanceStatus[]).map((s) => (
-        <div key={s} className="flex items-center gap-1.5">
-          <div className={cn("h-5 w-5 rounded border inline-flex items-center justify-center font-bold", STATUS_STYLES[s].bg, STATUS_STYLES[s].text)}>{STATUS_STYLES[s].symbol}</div>
-          <span className="text-muted-foreground">{t(`group.legend.${s}`)}</span>
+    <button onClick={onClick} className="inline-flex flex-col items-center gap-0.5">
+      <span className={cn("h-9 w-9 rounded-md inline-flex items-center justify-center shadow-sm", styles.bg, styles.text)}>
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className={cn("text-[10px] font-semibold", styles.text.replace("-foreground", ""))}>{label}</span>
+    </button>
+  );
+}
+
+function RatingRow({ rank, student }: { rank: number; student: any }) {
+  const initial = (student.full_name || "?").trim().charAt(0).toUpperCase();
+  const score = student.score as number;
+
+  const RankBadge = () => {
+    if (rank === 1) return <Trophy className="h-5 w-5 text-amber-400 fill-amber-400/30" />;
+    if (rank === 2) return <Medal className="h-5 w-5 text-slate-400 fill-slate-400/30" />;
+    if (rank === 3) return <Award className="h-5 w-5 text-orange-500 fill-orange-500/30" />;
+    return <span className="text-xs font-bold text-muted-foreground">#{rank}</span>;
+  };
+
+  return (
+    <div className="flex items-center gap-2.5 rounded-lg p-2 hover:bg-muted/40">
+      <div className="w-7 flex items-center justify-center shrink-0"><RankBadge /></div>
+      <div className="h-8 w-8 rounded-full bg-info/15 text-info inline-flex items-center justify-center text-xs font-bold shrink-0">{initial}</div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold truncate">{student.full_name}</div>
+        <div className="flex items-center gap-2 text-[10px]">
+          <span className="text-muted-foreground">{student.attScore.toFixed(1)}<br /><span className="text-[9px]">Davomat</span></span>
+          <span className="text-success">+{student.rewardSum.toFixed(1)}<br /><span className="text-[9px] text-muted-foreground">Mukofot</span></span>
+          <span className="text-destructive">{student.penaltySum.toFixed(1)}<br /><span className="text-[9px] text-muted-foreground">Jarima</span></span>
         </div>
-      ))}
+      </div>
+      <span className={cn("inline-flex items-center justify-center min-w-12 h-7 px-2 rounded-full text-xs font-bold shrink-0", score >= 0 ? "bg-amber-400/20 text-amber-700 dark:text-amber-400" : "bg-destructive/15 text-destructive")}>
+        {score.toFixed(1)}
+      </span>
     </div>
   );
 }
 
-function RewardCell({ studentId, groupId, sum }: { studentId: string; groupId: string; sum: number }) {
+function Legend() {
+  const { t } = useTranslation();
+  return (
+    <div className="mt-4 flex flex-wrap gap-3 text-xs">
+      {(["present","late","absent","excused","unknown"] as AttendanceStatus[]).map((s) => {
+        const Icon = STATUS_ICONS[s];
+        return (
+          <div key={s} className="flex items-center gap-1.5">
+            <div className={cn("h-5 w-5 rounded inline-flex items-center justify-center", STATUS_STYLES[s].bg, STATUS_STYLES[s].text)}>
+              <Icon className="h-3 w-3" />
+            </div>
+            <span className="text-muted-foreground">{t(`group.legend.${s}`)}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function RewardPair({ studentId, groupId, rewardSum, penaltySum }: { studentId: string; groupId: string; rewardSum: number; penaltySum: number }) {
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <RewardButton studentId={studentId} groupId={groupId} sign={1} sum={rewardSum} />
+      <RewardButton studentId={studentId} groupId={groupId} sign={-1} sum={Math.abs(penaltySum)} />
+    </div>
+  );
+}
+
+function RewardButton({ studentId, groupId, sign, sum }: { studentId: string; groupId: string; sign: 1 | -1; sum: number }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = React.useState(false);
   const [points, setPoints] = React.useState("1");
   const [reason, setReason] = React.useState("");
-  const [sign, setSign] = React.useState<1 | -1>(1);
 
   const submit = useMutation({
     mutationFn: async () => {
@@ -255,26 +356,28 @@ function RewardCell({ studentId, groupId, sum }: { studentId: string; groupId: s
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["group-students", groupId] }); setOpen(false); setPoints("1"); setReason(""); toast.success(t("common.success")); },
   });
 
+  const isReward = sign > 0;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className={cn("inline-flex items-center gap-1 h-7 px-2.5 rounded-md border text-xs font-semibold", sum >= 0 ? "border-success/30 text-success bg-success/10" : "border-destructive/30 text-destructive bg-destructive/10")}>
-          {sum >= 0 ? <Plus className="h-3 w-3" /> : <Minus className="h-3 w-3" />} {sum.toFixed(1)}
+        <button className={cn(
+          "inline-flex items-center gap-1 h-8 px-3 rounded-md border text-xs font-bold min-w-12 justify-center",
+          isReward
+            ? "border-success/40 text-success bg-success/5 hover:bg-success/10"
+            : "border-destructive/40 text-destructive bg-destructive/5 hover:bg-destructive/10",
+        )}>
+          {isReward ? <Plus className="h-3 w-3" /> : <Minus className="h-3 w-3" />} {sum.toFixed(0)}
         </button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>{sign > 0 ? t("attendance.addReward") : t("attendance.addPenalty")}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{isReward ? t("attendance.addReward") : t("attendance.addPenalty")}</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          <div className="flex gap-2">
-            <Button type="button" variant={sign === 1 ? "default" : "outline"} onClick={() => setSign(1)} className="flex-1 gap-1"><Award className="h-4 w-4" /> {t("attendance.addReward")}</Button>
-            <Button type="button" variant={sign === -1 ? "default" : "outline"} onClick={() => setSign(-1)} className="flex-1 gap-1"><Minus className="h-4 w-4" /> {t("attendance.addPenalty")}</Button>
-          </div>
           <div><Label>{t("attendance.points")}</Label><Input type="number" step="0.1" min="0" value={points} onChange={(e) => setPoints(e.target.value)} /></div>
           <div><Label>{t("attendance.reason")}</Label><Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("attendance.reasonPh")} /></div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
-          <Button onClick={() => submit.mutate()} disabled={submit.isPending}>{t("common.save")}</Button>
+          <Button onClick={() => submit.mutate()} disabled={submit.isPending} className={isReward ? "bg-success hover:bg-success/90 text-success-foreground" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}>{t("common.save")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

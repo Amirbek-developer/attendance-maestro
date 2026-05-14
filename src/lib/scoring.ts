@@ -6,18 +6,21 @@ export const STATUS_POINTS: Record<AttendanceStatus, number> = {
   present: 1,
   late: 0.5,
   absent: -1,
+  excused: 0,
   unknown: 0,
 };
 
-export const STATUS_STYLES: Record<AttendanceStatus, { bg: string; text: string; symbol: string; label: string }> = {
-  present: { bg: "bg-success/15 border-success/30", text: "text-success", symbol: "✓", label: "present" },
-  late:    { bg: "bg-warning/15 border-warning/30", text: "text-warning", symbol: "○", label: "late" },
-  absent:  { bg: "bg-destructive/15 border-destructive/30", text: "text-destructive", symbol: "−", label: "absent" },
-  unknown: { bg: "bg-muted border-border", text: "text-muted-foreground", symbol: "·", label: "unknown" },
+export const STATUS_STYLES: Record<AttendanceStatus, { bg: string; text: string; border: string; symbol: string; iconName: "check" | "clock" | "x" | "alert" | "dot"; label: string }> = {
+  present: { bg: "bg-success",     text: "text-success-foreground",     border: "border-success",     symbol: "✓", iconName: "check", label: "present" },
+  late:    { bg: "bg-warning",     text: "text-warning-foreground",     border: "border-warning",     symbol: "○", iconName: "clock", label: "late" },
+  absent:  { bg: "bg-destructive", text: "text-destructive-foreground", border: "border-destructive", symbol: "✕", iconName: "x",     label: "absent" },
+  excused: { bg: "bg-amber-400 dark:bg-amber-500", text: "text-amber-950 dark:text-amber-50", border: "border-amber-400", symbol: "!", iconName: "alert", label: "excused" },
+  unknown: { bg: "bg-muted",       text: "text-muted-foreground",       border: "border-border",      symbol: "·", iconName: "dot",   label: "unknown" },
 };
 
 export function nextStatus(s: AttendanceStatus): AttendanceStatus {
-  const order: AttendanceStatus[] = ["unknown", "present", "late", "absent"];
+  // Cycle: unknown -> present -> late -> absent -> excused -> unknown
+  const order: AttendanceStatus[] = ["unknown", "present", "late", "absent", "excused"];
   return order[(order.indexOf(s) + 1) % order.length];
 }
 

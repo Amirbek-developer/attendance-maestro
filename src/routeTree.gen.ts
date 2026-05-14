@@ -19,7 +19,10 @@ import { Route as DashboardRatingRouteImport } from './routes/dashboard.rating'
 import { Route as DashboardExamsRouteImport } from './routes/dashboard.exams'
 import { Route as DashboardAiRouteImport } from './routes/dashboard.ai'
 import { Route as DashboardAcademyRouteImport } from './routes/dashboard.academy'
+import { Route as DashboardSystemIndexRouteImport } from './routes/dashboard.system.index'
 import { Route as DashboardAcademyIndexRouteImport } from './routes/dashboard.academy.index'
+import { Route as DashboardSystemDataRouteImport } from './routes/dashboard.system.data'
+import { Route as DashboardSystemArchiveRouteImport } from './routes/dashboard.system.archive'
 import { Route as DashboardAcademyGroupIdRouteImport } from './routes/dashboard.academy.$groupId'
 
 const DashboardRoute = DashboardRouteImport.update({
@@ -72,10 +75,25 @@ const DashboardAcademyRoute = DashboardAcademyRouteImport.update({
   path: '/academy',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSystemIndexRoute = DashboardSystemIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardSystemRoute,
+} as any)
 const DashboardAcademyIndexRoute = DashboardAcademyIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardAcademyRoute,
+} as any)
+const DashboardSystemDataRoute = DashboardSystemDataRouteImport.update({
+  id: '/data',
+  path: '/data',
+  getParentRoute: () => DashboardSystemRoute,
+} as any)
+const DashboardSystemArchiveRoute = DashboardSystemArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
+  getParentRoute: () => DashboardSystemRoute,
 } as any)
 const DashboardAcademyGroupIdRoute = DashboardAcademyGroupIdRouteImport.update({
   id: '/$groupId',
@@ -92,10 +110,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/exams': typeof DashboardExamsRoute
   '/dashboard/rating': typeof DashboardRatingRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/system': typeof DashboardSystemRoute
+  '/dashboard/system': typeof DashboardSystemRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/system/archive': typeof DashboardSystemArchiveRoute
+  '/dashboard/system/data': typeof DashboardSystemDataRoute
   '/dashboard/academy/': typeof DashboardAcademyIndexRoute
+  '/dashboard/system/': typeof DashboardSystemIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -104,10 +125,12 @@ export interface FileRoutesByTo {
   '/dashboard/exams': typeof DashboardExamsRoute
   '/dashboard/rating': typeof DashboardRatingRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/system': typeof DashboardSystemRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/system/archive': typeof DashboardSystemArchiveRoute
+  '/dashboard/system/data': typeof DashboardSystemDataRoute
   '/dashboard/academy': typeof DashboardAcademyIndexRoute
+  '/dashboard/system': typeof DashboardSystemIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -119,10 +142,13 @@ export interface FileRoutesById {
   '/dashboard/exams': typeof DashboardExamsRoute
   '/dashboard/rating': typeof DashboardRatingRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
-  '/dashboard/system': typeof DashboardSystemRoute
+  '/dashboard/system': typeof DashboardSystemRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/system/archive': typeof DashboardSystemArchiveRoute
+  '/dashboard/system/data': typeof DashboardSystemDataRoute
   '/dashboard/academy/': typeof DashboardAcademyIndexRoute
+  '/dashboard/system/': typeof DashboardSystemIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,7 +164,10 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard/'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/system/archive'
+    | '/dashboard/system/data'
     | '/dashboard/academy/'
+    | '/dashboard/system/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -147,10 +176,12 @@ export interface FileRouteTypes {
     | '/dashboard/exams'
     | '/dashboard/rating'
     | '/dashboard/settings'
-    | '/dashboard/system'
     | '/dashboard'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/system/archive'
+    | '/dashboard/system/data'
     | '/dashboard/academy'
+    | '/dashboard/system'
   id:
     | '__root__'
     | '/'
@@ -164,7 +195,10 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard/'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/system/archive'
+    | '/dashboard/system/data'
     | '/dashboard/academy/'
+    | '/dashboard/system/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -245,12 +279,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAcademyRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/system/': {
+      id: '/dashboard/system/'
+      path: '/'
+      fullPath: '/dashboard/system/'
+      preLoaderRoute: typeof DashboardSystemIndexRouteImport
+      parentRoute: typeof DashboardSystemRoute
+    }
     '/dashboard/academy/': {
       id: '/dashboard/academy/'
       path: '/'
       fullPath: '/dashboard/academy/'
       preLoaderRoute: typeof DashboardAcademyIndexRouteImport
       parentRoute: typeof DashboardAcademyRoute
+    }
+    '/dashboard/system/data': {
+      id: '/dashboard/system/data'
+      path: '/data'
+      fullPath: '/dashboard/system/data'
+      preLoaderRoute: typeof DashboardSystemDataRouteImport
+      parentRoute: typeof DashboardSystemRoute
+    }
+    '/dashboard/system/archive': {
+      id: '/dashboard/system/archive'
+      path: '/archive'
+      fullPath: '/dashboard/system/archive'
+      preLoaderRoute: typeof DashboardSystemArchiveRouteImport
+      parentRoute: typeof DashboardSystemRoute
     }
     '/dashboard/academy/$groupId': {
       id: '/dashboard/academy/$groupId'
@@ -275,13 +330,29 @@ const DashboardAcademyRouteChildren: DashboardAcademyRouteChildren = {
 const DashboardAcademyRouteWithChildren =
   DashboardAcademyRoute._addFileChildren(DashboardAcademyRouteChildren)
 
+interface DashboardSystemRouteChildren {
+  DashboardSystemArchiveRoute: typeof DashboardSystemArchiveRoute
+  DashboardSystemDataRoute: typeof DashboardSystemDataRoute
+  DashboardSystemIndexRoute: typeof DashboardSystemIndexRoute
+}
+
+const DashboardSystemRouteChildren: DashboardSystemRouteChildren = {
+  DashboardSystemArchiveRoute: DashboardSystemArchiveRoute,
+  DashboardSystemDataRoute: DashboardSystemDataRoute,
+  DashboardSystemIndexRoute: DashboardSystemIndexRoute,
+}
+
+const DashboardSystemRouteWithChildren = DashboardSystemRoute._addFileChildren(
+  DashboardSystemRouteChildren,
+)
+
 interface DashboardRouteChildren {
   DashboardAcademyRoute: typeof DashboardAcademyRouteWithChildren
   DashboardAiRoute: typeof DashboardAiRoute
   DashboardExamsRoute: typeof DashboardExamsRoute
   DashboardRatingRoute: typeof DashboardRatingRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
-  DashboardSystemRoute: typeof DashboardSystemRoute
+  DashboardSystemRoute: typeof DashboardSystemRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -291,7 +362,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardExamsRoute: DashboardExamsRoute,
   DashboardRatingRoute: DashboardRatingRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
-  DashboardSystemRoute: DashboardSystemRoute,
+  DashboardSystemRoute: DashboardSystemRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
