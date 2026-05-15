@@ -69,7 +69,7 @@ function DashboardLayout() {
       >
         <div className="h-14 flex items-center px-3 border-b border-sidebar-border shrink-0">
           <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0">T</div>
-          <span className={cn("ml-2 font-bold tracking-tight whitespace-nowrap transition-opacity", expanded ? "opacity-100" : "opacity-0")}>TeachPro</span>
+          <span className={cn("ml-2 font-bold tracking-tight whitespace-nowrap transition-opacity", expanded ? "opacity-100" : "opacity-0")}>UstozPro</span>
         </div>
         <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-1">
           {items.map((it) => (
@@ -97,7 +97,7 @@ function DashboardLayout() {
             <div className="h-14 flex items-center justify-between px-3 border-b border-sidebar-border">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">T</div>
-                <span className="font-bold">TeachPro</span>
+                <span className="font-bold">UstozPro</span>
               </div>
               <button onClick={() => setMobileOpen(false)}><X className="h-5 w-5" /></button>
             </div>
@@ -126,7 +126,7 @@ function DashboardLayout() {
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0">T</div>
             <div className="min-w-0">
-              <div className="text-sm font-bold leading-tight truncate">TeachPro</div>
+              <div className="text-sm font-bold leading-tight truncate">UstozPro</div>
               <div className="text-[11px] text-muted-foreground leading-tight truncate">
                 {t("auth.welcome")}, {fullName}
               </div>

@@ -4,11 +4,11 @@ import { initReactI18next } from "react-i18next";
 const resources = {
   uz: {
     translation: {
-      app: { name: "TeachPro", tagline: "O'qituvchilar uchun davomat va reyting tizimi" },
+      app: { name: "UstozPro", tagline: "O'qituvchilar uchun davomat va reyting tizimi" },
       auth: {
         welcome: "Xush kelibsiz",
         loginSubtitle: "O'qituvchi hisobingizga kiring",
-        joinTitle: "TeachPro ga qo'shiling",
+        joinTitle: "UstozPro ga qo'shiling",
         joinSubtitle: "O'qituvchi hisobingizni yarating",
         ratingCta: "O'quvchilar reytingiga qaytish",
         login: "Kirish", register: "Ro'yxatdan o'tish",
@@ -196,10 +196,10 @@ const resources = {
   },
   ru: {
     translation: {
-      app: { name: "TeachPro", tagline: "Система посещаемости и рейтинга для учителей" },
+      app: { name: "UstozPro", tagline: "Система посещаемости и рейтинга для учителей" },
       auth: {
         welcome: "Добро пожаловать", loginSubtitle: "Войдите в учетную запись учителя",
-        joinTitle: "Присоединиться к TeachPro", joinSubtitle: "Создайте учетную запись учителя",
+        joinTitle: "Присоединиться к UstozPro", joinSubtitle: "Создайте учетную запись учителя",
         ratingCta: "Вернуться к рейтингу учеников",
         login: "Вход", register: "Регистрация",
         email: "Email", emailPh: "ваш.email@школа.uz",
@@ -329,10 +329,10 @@ const resources = {
   },
   en: {
     translation: {
-      app: { name: "TeachPro", tagline: "Attendance & rating system for teachers" },
+      app: { name: "UstozPro", tagline: "Attendance & rating system for teachers" },
       auth: {
         welcome: "Welcome", loginSubtitle: "Sign in to your teacher account",
-        joinTitle: "Join TeachPro", joinSubtitle: "Create your teacher account",
+        joinTitle: "Join UstozPro", joinSubtitle: "Create your teacher account",
         ratingCta: "Back to student rating",
         login: "Sign in", register: "Sign up",
         email: "Email", emailPh: "your.email@school.uz",
