@@ -3,7 +3,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useTranslation } from "react-i18next";
 import {
   LayoutGrid, GraduationCap, FileCheck2, Trophy, Sparkles, Database,
-  Settings, LogOut, Menu,
+  Settings, LogOut, Menu, X,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
