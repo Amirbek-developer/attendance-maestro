@@ -138,26 +138,6 @@ function DashboardLayout() {
           </div>
         </header>
 
-        <div className="px-3 sm:px-6 pt-4 space-y-2">
-          {!demoDismissed && (
-            <div className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-2.5 text-sm flex items-start gap-2">
-              <Clock className="h-4 w-4 text-warning mt-0.5 shrink-0" />
-              <div className="flex-1">
-                <span className="font-semibold text-warning">{t("demo.title")} </span>
-                <span className="text-foreground/80">{t("demo.body")}</span>
-              </div>
-              <button onClick={() => setDemoDismissed(true)} className="text-muted-foreground hover:text-foreground">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-          <div className="rounded-lg border bg-card px-4 py-2 text-xs flex items-center gap-3">
-            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-muted-foreground tracking-wider font-semibold">{t("demo.daysLeft", { n: 7 })}</span>
-            <button className="ml-auto text-foreground/70 hover:text-foreground underline-offset-4 hover:underline">{t("demo.buy")}</button>
-          </div>
-        </div>
-
         <main className="flex-1 px-3 sm:px-6 py-5">
           <Outlet />
         </main>
