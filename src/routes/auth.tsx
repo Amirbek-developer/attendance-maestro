@@ -117,7 +117,7 @@ function LoginForm() {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(t("common.success"));
-    navigate({ to: "/dashboard" });
+    // Don't navigate here — AuthPage's useEffect will redirect once `user` is hydrated.
   };
 
   return (
