@@ -117,7 +117,7 @@ function LoginForm() {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(t("common.success"));
-    navigate({ to: "/dashboard" });
+    // Don't navigate here — AuthPage's useEffect will redirect once `user` is hydrated.
   };
 
   return (
@@ -166,9 +166,9 @@ function RegisterForm({ onDone }: { onDone: () => void }) {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(t("common.success"));
-    // Auto-confirm enabled — try direct sign in
+    // Auto-confirm enabled — try direct sign in; AuthPage useEffect will redirect.
     const { error: e2 } = await supabase.auth.signInWithPassword({ email, password });
-    if (!e2) navigate({ to: "/dashboard" }); else onDone();
+    if (e2) onDone();
   };
 
   return (
