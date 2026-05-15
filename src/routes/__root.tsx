@@ -50,9 +50,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TeachPro — O'qituvchilar uchun davomat va reyting" },
+      { title: "UstozPro — O'qituvchilar uchun davomat va reyting" },
       { name: "description", content: "O'qituvchilar uchun o'quvchilar davomati, mukofot va jarima ballarini yuritish tizimi." },
-      { property: "og:title", content: "TeachPro" },
+      { property: "og:title", content: "UstozPro" },
       { property: "og:description", content: "O'qituvchilar uchun davomat va reyting tizimi." },
       { property: "og:type", content: "website" },
     ],
