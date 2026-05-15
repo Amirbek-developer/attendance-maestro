@@ -24,7 +24,7 @@ function DashboardLayout() {
   const { user, loading } = useAuth();
   const [hover, setHover] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [demoDismissed, setDemoDismissed] = React.useState(false);
+  
 
   React.useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
