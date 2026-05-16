@@ -158,7 +158,7 @@ export function StudentsTab() {
           <tbody>
             {filtered.map((s: any) => (
               <tr key={s.id} className="border-t hover:bg-muted/20">
-                <td className="p-3 font-semibold">{s.full_name}</td>
+                <td className="p-3 font-semibold"><Link to="/dashboard/students/$studentId" params={{ studentId: s.id }} className="hover:text-info hover:underline">{s.full_name}</Link></td>
                 <td className="p-3 text-muted-foreground">{s.groups?.name}</td>
                 <td className="p-3">{s.recCount > 0 ? `${s.att}%` : "—"}</td>
                 <td className={"p-3 font-semibold " + (s.score < 0 ? "text-destructive" : "text-success")}>{s.score.toFixed(1)}</td>
