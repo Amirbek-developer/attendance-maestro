@@ -1,10 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { Users, BookOpen, TrendingUp, Trophy, BarChart3, Calendar } from "lucide-react";
+import { Users, BookOpen, TrendingUp, Trophy, BarChart3, Calendar, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { STATUS_POINTS } from "@/lib/scoring";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/dashboard/")({
