@@ -23,6 +23,7 @@ import { Route as DashboardSystemIndexRouteImport } from './routes/dashboard.sys
 import { Route as DashboardAcademyIndexRouteImport } from './routes/dashboard.academy.index'
 import { Route as DashboardSystemDataRouteImport } from './routes/dashboard.system.data'
 import { Route as DashboardSystemArchiveRouteImport } from './routes/dashboard.system.archive'
+import { Route as DashboardStudentsStudentIdRouteImport } from './routes/dashboard.students.$studentId'
 import { Route as DashboardAcademyGroupIdRouteImport } from './routes/dashboard.academy.$groupId'
 
 const DashboardRoute = DashboardRouteImport.update({
@@ -95,6 +96,12 @@ const DashboardSystemArchiveRoute = DashboardSystemArchiveRouteImport.update({
   path: '/archive',
   getParentRoute: () => DashboardSystemRoute,
 } as any)
+const DashboardStudentsStudentIdRoute =
+  DashboardStudentsStudentIdRouteImport.update({
+    id: '/students/$studentId',
+    path: '/students/$studentId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardAcademyGroupIdRoute = DashboardAcademyGroupIdRouteImport.update({
   id: '/$groupId',
   path: '/$groupId',
@@ -113,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/system': typeof DashboardSystemRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/students/$studentId': typeof DashboardStudentsStudentIdRoute
   '/dashboard/system/archive': typeof DashboardSystemArchiveRoute
   '/dashboard/system/data': typeof DashboardSystemDataRoute
   '/dashboard/academy/': typeof DashboardAcademyIndexRoute
@@ -127,6 +135,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/students/$studentId': typeof DashboardStudentsStudentIdRoute
   '/dashboard/system/archive': typeof DashboardSystemArchiveRoute
   '/dashboard/system/data': typeof DashboardSystemDataRoute
   '/dashboard/academy': typeof DashboardAcademyIndexRoute
@@ -145,6 +154,7 @@ export interface FileRoutesById {
   '/dashboard/system': typeof DashboardSystemRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/academy/$groupId': typeof DashboardAcademyGroupIdRoute
+  '/dashboard/students/$studentId': typeof DashboardStudentsStudentIdRoute
   '/dashboard/system/archive': typeof DashboardSystemArchiveRoute
   '/dashboard/system/data': typeof DashboardSystemDataRoute
   '/dashboard/academy/': typeof DashboardAcademyIndexRoute
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard/'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/students/$studentId'
     | '/dashboard/system/archive'
     | '/dashboard/system/data'
     | '/dashboard/academy/'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/students/$studentId'
     | '/dashboard/system/archive'
     | '/dashboard/system/data'
     | '/dashboard/academy'
@@ -195,6 +207,7 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard/'
     | '/dashboard/academy/$groupId'
+    | '/dashboard/students/$studentId'
     | '/dashboard/system/archive'
     | '/dashboard/system/data'
     | '/dashboard/academy/'
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSystemArchiveRouteImport
       parentRoute: typeof DashboardSystemRoute
     }
+    '/dashboard/students/$studentId': {
+      id: '/dashboard/students/$studentId'
+      path: '/students/$studentId'
+      fullPath: '/dashboard/students/$studentId'
+      preLoaderRoute: typeof DashboardStudentsStudentIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/academy/$groupId': {
       id: '/dashboard/academy/$groupId'
       path: '/$groupId'
@@ -354,6 +374,7 @@ interface DashboardRouteChildren {
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardSystemRoute: typeof DashboardSystemRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardStudentsStudentIdRoute: typeof DashboardStudentsStudentIdRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -364,6 +385,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSystemRoute: DashboardSystemRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardStudentsStudentIdRoute: DashboardStudentsStudentIdRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
@@ -378,3 +400,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
