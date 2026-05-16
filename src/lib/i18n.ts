@@ -44,6 +44,12 @@ const resources = {
         noMonthly: "Oylik ma'lumotlar topilmadi",
         allGroups: "Barcha guruhlar",
         all: "Barchasi",
+        lessonsDone: "dars o'tildi",
+        attRate: "Davomat ko'rsatkichi",
+        overallMetrics: "Umumiy ko'rsatkichlar",
+        studentShort: "O'quvchi",
+        efficiency: "Samaradorlik",
+        good: "YAXSHI", avg: "O'RTA", low: "PAST",
       },
       groups: {
         title: "Guruhlar boshqaruvi",
