@@ -147,7 +147,7 @@ function GroupDetail() {
                       <tr key={s.id} className="border-t hover:bg-muted/20">
                         <td className="p-3 text-muted-foreground">{i + 1}</td>
                         <td className="p-3">
-                          <div className="font-semibold">{s.full_name}</div>
+                          <Link to="/dashboard/students/$studentId" params={{ studentId: s.id }} className="font-semibold hover:text-info hover:underline">{s.full_name}</Link>
                           <div className="text-xs text-muted-foreground">ID yo'q</div>
                         </td>
                         <td className="p-3 text-center">
