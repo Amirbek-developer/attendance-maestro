@@ -364,6 +364,9 @@ const resources = {
         groupsRating: "Groups rating", monthly: "Monthly analysis",
         noData: "No data found", noMonthly: "No monthly data",
         allGroups: "All groups", all: "All",
+        lessonsDone: "lesson held", attRate: "Attendance rate",
+        overallMetrics: "Overall metrics", studentShort: "Student",
+        efficiency: "Efficiency", good: "GOOD", avg: "AVG", low: "LOW",
       },
       groups: {
         title: "Groups management", subtitle: "Create and manage your classes",
