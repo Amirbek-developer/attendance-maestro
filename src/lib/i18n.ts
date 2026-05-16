@@ -44,6 +44,12 @@ const resources = {
         noMonthly: "Oylik ma'lumotlar topilmadi",
         allGroups: "Barcha guruhlar",
         all: "Barchasi",
+        lessonsDone: "dars o'tildi",
+        attRate: "Davomat ko'rsatkichi",
+        overallMetrics: "Umumiy ko'rsatkichlar",
+        studentShort: "O'quvchi",
+        efficiency: "Samaradorlik",
+        good: "YAXSHI", avg: "O'RTA", low: "PAST",
       },
       groups: {
         title: "Guruhlar boshqaruvi",
@@ -222,6 +228,9 @@ const resources = {
         groupsRating: "Рейтинг групп", monthly: "Месячный анализ",
         noData: "Данные не найдены", noMonthly: "Нет месячных данных",
         allGroups: "Все группы", all: "Все",
+        lessonsDone: "урок проведён", attRate: "Посещаемость",
+        overallMetrics: "Общие показатели", studentShort: "Ученик",
+        efficiency: "Эффективность", good: "ХОРОШО", avg: "СРЕДНЕ", low: "НИЗКО",
       },
       groups: {
         title: "Управление группами", subtitle: "Создавайте и управляйте классами",
@@ -355,6 +364,9 @@ const resources = {
         groupsRating: "Groups rating", monthly: "Monthly analysis",
         noData: "No data found", noMonthly: "No monthly data",
         allGroups: "All groups", all: "All",
+        lessonsDone: "lesson held", attRate: "Attendance rate",
+        overallMetrics: "Overall metrics", studentShort: "Student",
+        efficiency: "Efficiency", good: "GOOD", avg: "AVG", low: "LOW",
       },
       groups: {
         title: "Groups management", subtitle: "Create and manage your classes",
