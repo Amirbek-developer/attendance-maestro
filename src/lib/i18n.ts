@@ -228,6 +228,9 @@ const resources = {
         groupsRating: "Рейтинг групп", monthly: "Месячный анализ",
         noData: "Данные не найдены", noMonthly: "Нет месячных данных",
         allGroups: "Все группы", all: "Все",
+        lessonsDone: "урок проведён", attRate: "Посещаемость",
+        overallMetrics: "Общие показатели", studentShort: "Ученик",
+        efficiency: "Эффективность", good: "ХОРОШО", avg: "СРЕДНЕ", low: "НИЗКО",
       },
       groups: {
         title: "Управление группами", subtitle: "Создавайте и управляйте классами",
