@@ -236,7 +236,9 @@ function GroupDetail() {
                       const att = recs.length ? Math.round((present / recs.length) * 100) : 0;
                       return (
                         <tr key={s.id} className="border-t">
-                          <td className="p-2 sticky left-0 bg-card font-semibold">{s.full_name}</td>
+                          <td className="p-2 sticky left-0 bg-card font-semibold">
+                            <Link to="/dashboard/students/$studentId" params={{ studentId: s.id }} className="hover:text-info hover:underline">{s.full_name}</Link>
+                          </td>
                           <td className="p-2 text-muted-foreground">{att}%</td>
                           {allDates.map((d) => {
                             const r = recs.find((x: any) => x.date === d);
