@@ -25,18 +25,68 @@ function Overview() {
     enabled: !!user,
     queryFn: async () => {
       const [g, s, a, r] = await Promise.all([
-        supabase.from("groups").select("id", { count: "exact", head: true }),
-        supabase.from("students").select("id", { count: "exact", head: true }),
-        supabase.from("attendance_records").select("status"),
+        supabase.from("groups").select("id,name"),
+        supabase.from("students").select("id,group_id"),
+        supabase.from("attendance_records").select("status,date,group_id,student_id"),
         supabase.from("reward_records").select("points,student_id"),
       ]);
-      const total = (a.data || []).length;
-      const present = (a.data || []).filter((x) => x.status === "present" || x.status === "late").length;
+      const groups = g.data || [];
+      const students = s.data || [];
+      const attendance = a.data || [];
+      const rewards = r.data || [];
+
+      const present = attendance.filter((x) => x.status === "present" || x.status === "late").length;
+      const overallAttendance = attendance.length ? Math.round((present / attendance.length) * 100) : 0;
+
+      // Top student by reward points
+      const ptsByStudent = new Map<string, number>();
+      for (const r of rewards) ptsByStudent.set(r.student_id, (ptsByStudent.get(r.student_id) || 0) + Number(r.points));
+      let topStudentId: string | null = null;
+      let topPts = -Infinity;
+      for (const [sid, pts] of ptsByStudent) if (pts > topPts) { topPts = pts; topStudentId = sid; }
+      const topName = topStudentId
+        ? (await supabase.from("students").select("full_name").eq("id", topStudentId).maybeSingle()).data?.full_name || "—"
+        : "—";
+
+      // Per group ranking
+      const perGroup = groups.map((grp) => {
+        const grpAtt = attendance.filter((x) => x.group_id === grp.id);
+        const grpPresent = grpAtt.filter((x) => x.status === "present" || x.status === "late").length;
+        const att = grpAtt.length ? Math.round((grpPresent / grpAtt.length) * 100) : 0;
+        const grpStudents = students.filter((x) => x.group_id === grp.id).length;
+        const lessons = new Set(grpAtt.map((x) => x.date)).size;
+        const breakdown = {
+          present: grpAtt.filter((x) => x.status === "present").length,
+          late: grpAtt.filter((x) => x.status === "late").length,
+          absent: grpAtt.filter((x) => x.status === "absent" || x.status === "excused").length,
+        };
+        return { id: grp.id, name: grp.name, att, students: grpStudents, lessons, breakdown };
+      }).sort((a, b) => b.att - a.att);
+
+      // Monthly (current month)
+      const now = new Date();
+      const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      const monthAtt = attendance.filter((x) => (x.date || "").startsWith(ym));
+      const monthPresent = monthAtt.filter((x) => x.status === "present" || x.status === "late").length;
+      const monthStats = {
+        att: monthAtt.length ? Math.round((monthPresent / monthAtt.length) * 100) : 0,
+        students: new Set(monthAtt.map((x) => x.student_id)).size,
+        lessons: new Set(monthAtt.map((x) => x.date)).size,
+        breakdown: {
+          present: monthAtt.filter((x) => x.status === "present").length,
+          late: monthAtt.filter((x) => x.status === "late").length,
+          absent: monthAtt.filter((x) => x.status === "absent" || x.status === "excused").length,
+        },
+      };
+
       return {
-        groups: g.count ?? 0,
-        students: s.count ?? 0,
-        attendance: total ? Math.round((present / total) * 100) : 0,
-        topPoints: (r.data || []).reduce((acc, x) => acc + Number(x.points), 0),
+        groups: groups.length,
+        students: students.length,
+        attendance: overallAttendance,
+        topName,
+        perGroup,
+        monthStats,
+        monthLabel: now.toLocaleDateString("default", { month: "long", year: "numeric" }),
       };
     },
   });
@@ -47,7 +97,7 @@ function Overview() {
     { icon: Users, label: t("dashboard.students"), value: stats?.students ?? 0, color: "info" },
     { icon: BookOpen, label: t("dashboard.lessons"), value: stats?.groups ?? 0, color: "success" },
     { icon: TrendingUp, label: t("dashboard.attendance"), value: `${stats?.attendance ?? 0}%`, color: "warning" },
-    { icon: Trophy, label: t("dashboard.topGrade"), value: stats?.topPoints ?? "—", color: "accent" },
+    { icon: Trophy, label: t("dashboard.topGrade"), value: stats?.topName ?? "—", color: "accent" },
   ];
 
   return (
