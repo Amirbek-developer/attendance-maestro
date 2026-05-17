@@ -224,7 +224,7 @@ const resources = {
       },
       dashboard: {
         welcome: "Добро пожаловать, {{name}}!", section: "Обзор",
-        students: "Ученики", lessons: "Уроки", attendance: "Посещаемость", topGrade: "Топ предмет",
+        students: "Ученики", lessons: "Уроки", attendance: "Посещаемость", topGrade: "Топ активный",
         groupsRating: "Рейтинг групп", monthly: "Месячный анализ",
         noData: "Данные не найдены", noMonthly: "Нет месячных данных",
         allGroups: "Все группы", all: "Все",
