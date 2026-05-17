@@ -71,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
     let channel: ReturnType<typeof supabase.channel> | null = null;
     let heartbeat: ReturnType<typeof setInterval> | null = null;
+    let cleanup: (() => void) | null = null;
     let cancelled = false;
 
     const evict = async (reason: "kicked" | "expired") => {
