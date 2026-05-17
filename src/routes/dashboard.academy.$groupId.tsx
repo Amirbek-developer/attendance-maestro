@@ -374,7 +374,7 @@ function RewardButton({ studentId, groupId, sign, sum }: { studentId: string; gr
       <DialogContent>
         <DialogHeader><DialogTitle>{isReward ? t("attendance.addReward") : t("attendance.addPenalty")}</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          <div><Label>{t("attendance.points")}</Label><Input type="number" step="0.1" min="0" value={points} onChange={(e) => setPoints(e.target.value)} /></div>
+          <div><Label>{t("attendance.points")}</Label><Input type="number" step="0.1" min="0" max="10" value={points} onChange={(e) => { const n = parseFloat(e.target.value); if (e.target.value === "" || isNaN(n)) setPoints(e.target.value); else setPoints(String(Math.min(10, Math.max(0, n)))); }} /></div>
           <div><Label>{t("attendance.reason")}</Label><Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("attendance.reasonPh")} /></div>
         </div>
         <DialogFooter>
