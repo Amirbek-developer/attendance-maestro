@@ -37,7 +37,7 @@ const resources = {
         students: "O'quvchilar",
         lessons: "Darslar",
         attendance: "Davomat",
-        topGrade: "Top fan",
+        topGrade: "Top faol",
         groupsRating: "Guruhlar reytingi",
         monthly: "Oylik tahlil",
         noData: "Ma'lumotlar topilmadi",
@@ -224,7 +224,7 @@ const resources = {
       },
       dashboard: {
         welcome: "Добро пожаловать, {{name}}!", section: "Обзор",
-        students: "Ученики", lessons: "Уроки", attendance: "Посещаемость", topGrade: "Топ предмет",
+        students: "Ученики", lessons: "Уроки", attendance: "Посещаемость", topGrade: "Топ активный",
         groupsRating: "Рейтинг групп", monthly: "Месячный анализ",
         noData: "Данные не найдены", noMonthly: "Нет месячных данных",
         allGroups: "Все группы", all: "Все",
@@ -360,7 +360,7 @@ const resources = {
       },
       dashboard: {
         welcome: "Welcome, {{name}}!", section: "Overview",
-        students: "Students", lessons: "Lessons", attendance: "Attendance", topGrade: "Top subject",
+        students: "Students", lessons: "Lessons", attendance: "Attendance", topGrade: "Top active",
         groupsRating: "Groups rating", monthly: "Monthly analysis",
         noData: "No data found", noMonthly: "No monthly data",
         allGroups: "All groups", all: "All",
