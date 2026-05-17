@@ -39,12 +39,18 @@ function Overview() {
       const present = attendance.filter((x) => x.status === "present" || x.status === "late").length;
       const overallAttendance = attendance.length ? Math.round((present / attendance.length) * 100) : 0;
 
-      // Top student by reward points
-      const ptsByStudent = new Map<string, number>();
-      for (const r of rewards) ptsByStudent.set(r.student_id, (ptsByStudent.get(r.student_id) || 0) + Number(r.points));
+      // Top student by overall rating (attendance points + rewards + penalties)
+      const scoreByStudent = new Map<string, number>();
+      for (const a of attendance) {
+        const pts = STATUS_POINTS[a.status as keyof typeof STATUS_POINTS] || 0;
+        scoreByStudent.set(a.student_id, (scoreByStudent.get(a.student_id) || 0) + pts);
+      }
+      for (const r of rewards) {
+        scoreByStudent.set(r.student_id, (scoreByStudent.get(r.student_id) || 0) + Number(r.points));
+      }
       let topStudentId: string | null = null;
       let topPts = -Infinity;
-      for (const [sid, pts] of ptsByStudent) if (pts > topPts) { topPts = pts; topStudentId = sid; }
+      for (const [sid, pts] of scoreByStudent) if (pts > topPts) { topPts = pts; topStudentId = sid; }
       const topName = topStudentId
         ? (await supabase.from("students").select("full_name").eq("id", topStudentId).maybeSingle()).data?.full_name || "—"
         : "—";
