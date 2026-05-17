@@ -360,7 +360,7 @@ const resources = {
       },
       dashboard: {
         welcome: "Welcome, {{name}}!", section: "Overview",
-        students: "Students", lessons: "Lessons", attendance: "Attendance", topGrade: "Top subject",
+        students: "Students", lessons: "Lessons", attendance: "Attendance", topGrade: "Top active",
         groupsRating: "Groups rating", monthly: "Monthly analysis",
         noData: "No data found", noMonthly: "No monthly data",
         allGroups: "All groups", all: "All",
