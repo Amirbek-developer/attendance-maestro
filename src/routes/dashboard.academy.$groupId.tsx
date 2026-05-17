@@ -351,7 +351,7 @@ function RewardButton({ studentId, groupId, sign, sum }: { studentId: string; gr
 
   const submit = useMutation({
     mutationFn: async () => {
-      const v = sign * Math.abs(parseFloat(points) || 0);
+      const v = sign * Math.min(10, Math.abs(parseFloat(points) || 0));
       const { error } = await supabase.from("reward_records").insert({ student_id: studentId, group_id: groupId, user_id: user!.id, points: v, reason });
       if (error) throw error;
     },
