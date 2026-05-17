@@ -136,8 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         )
         .subscribe();
 
-      // Heartbeat: every 30s verify token + bump last_seen (fallback if realtime drops)
-      heartbeat = setInterval(async () => {
+      const verify = async () => {
         if (cancelled) return;
         const { data, error } = await supabase
           .from("active_sessions")
@@ -152,13 +151,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await supabase.from("active_sessions").update({
           last_seen: new Date().toISOString(),
         }).eq("user_id", user.id);
-      }, 30_000);
+      };
+
+      // Aggressive heartbeat — every 5s
+      heartbeat = setInterval(verify, 5_000);
+
+      // Verify on tab focus / visibility / network reconnect
+      const onFocus = () => { verify(); };
+      const onVisible = () => { if (document.visibilityState === "visible") verify(); };
+      window.addEventListener("focus", onFocus);
+      window.addEventListener("online", onFocus);
+      document.addEventListener("visibilitychange", onVisible);
+
+      // Cross-tab instant kick within same browser
+      let bc: BroadcastChannel | null = null;
+      try {
+        bc = new BroadcastChannel(`upro-session-${user.id}`);
+        bc.postMessage({ type: "claim", token: activeToken });
+        bc.onmessage = (ev) => {
+          if (ev.data?.type === "claim" && ev.data.token !== activeToken) {
+            evict("kicked");
+          }
+        };
+      } catch {}
+
+      cleanup = () => {
+        window.removeEventListener("focus", onFocus);
+        window.removeEventListener("online", onFocus);
+        document.removeEventListener("visibilitychange", onVisible);
+        if (bc) bc.close();
+      };
     })();
 
     return () => {
       cancelled = true;
       if (channel) supabase.removeChannel(channel);
       if (heartbeat) clearInterval(heartbeat);
+      if (cleanup) cleanup();
     };
   }, [user]);
 
