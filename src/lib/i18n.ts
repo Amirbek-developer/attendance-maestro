@@ -37,7 +37,7 @@ const resources = {
         students: "O'quvchilar",
         lessons: "Darslar",
         attendance: "Davomat",
-        topGrade: "Top fan",
+        topGrade: "Top faol",
         groupsRating: "Guruhlar reytingi",
         monthly: "Oylik tahlil",
         noData: "Ma'lumotlar topilmadi",
