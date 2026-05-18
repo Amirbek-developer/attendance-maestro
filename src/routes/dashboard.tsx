@@ -55,6 +55,11 @@ function DashboardLayout() {
   const expanded = hover || mobileOpen;
   const fullName = profile?.full_name || user.email?.split("@")[0] || "";
   const firstName = fullName.split(" ")[0] || fullName;
+  const signOut = async () => {
+    await supabase.from("active_sessions").delete().eq("user_id", user.id);
+    await supabase.auth.signOut();
+    navigate({ to: "/auth" });
+  };
 
   return (
     <div className="min-h-screen bg-muted/30 flex">
@@ -79,7 +84,7 @@ function DashboardLayout() {
         <div className="border-t border-sidebar-border p-2 space-y-1">
           <SidebarLink to="/dashboard/settings" icon={Settings} label={t("nav.settings")} expanded={expanded} />
           <button
-            onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); toast.success(t("auth.signOut")); }}
+            onClick={async () => { await signOut(); toast.success(t("auth.signOut")); }}
             className={cn(
               "w-full flex items-center gap-3 rounded-md px-3 h-10 text-sm font-medium text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors",
             )}
@@ -107,7 +112,7 @@ function DashboardLayout() {
             <div className="border-t border-sidebar-border p-2 space-y-1">
               <SidebarLink to="/dashboard/settings" icon={Settings} label={t("nav.settings")} expanded />
               <button
-                onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); }}
+                onClick={signOut}
                 className="w-full flex items-center gap-3 rounded-md px-3 h-10 text-sm font-medium text-muted-foreground hover:bg-sidebar-accent"
               >
                 <LogOut className="h-4 w-4" /> <span>{t("nav.signOut")}</span>
