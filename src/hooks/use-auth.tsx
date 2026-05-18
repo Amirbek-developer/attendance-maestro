@@ -139,6 +139,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const verify = async () => {
         if (cancelled) return;
+        // 1) Validate server-side that our access token is still valid.
+        //    If another device called signOut({scope:'others'}), this returns an error.
+        const { data: u, error: uErr } = await supabase.auth.getUser();
+        if (uErr || !u?.user) { evict("kicked"); return; }
+
+        // 2) Check single-session token row.
         const { data, error } = await supabase
           .from("active_sessions")
           .select("session_token")
