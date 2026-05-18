@@ -12,6 +12,7 @@ interface AuthCtx {
 const Ctx = React.createContext<AuthCtx>({ user: null, session: null, loading: true, kicked: false });
 
 const TOKEN_KEY = "upro.session_token";
+const SESSION_STALE_MS = 2 * 60 * 1000;
 
 function getOrCreateLocalToken(userId: string) {
   const key = `${TOKEN_KEY}.${userId}`;
@@ -91,16 +92,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Read current DB token
       const { data: existing } = await supabase
         .from("active_sessions")
-        .select("session_token")
+        .select("session_token,last_seen")
         .eq("user_id", user.id)
         .maybeSingle();
 
       const localToken = getOrCreateLocalToken(user.id);
       let activeToken = localToken;
+      const lastSeenMs = existing?.last_seen ? new Date(existing.last_seen).getTime() : 0;
+      const sessionIsFresh = lastSeenMs > 0 && Date.now() - lastSeenMs < SESSION_STALE_MS;
+
+      if (existing && existing.session_token !== localToken && sessionIsFresh) {
+        await evict("kicked");
+        return;
+      }
 
       if (!existing || existing.session_token !== localToken) {
-        // Either no session yet, or another device holds it.
-        // Claim ownership — this kicks any previous device.
+        // No active fresh session, or the old one is stale — claim this device.
         activeToken = rotateLocalToken(user.id);
         await supabase.from("active_sessions").upsert({
           user_id: user.id,

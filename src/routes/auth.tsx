@@ -14,6 +14,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
 const search = z.object({ tab: z.enum(["login", "register"]).optional() });
+const TOKEN_KEY = "upro.session_token";
+const SESSION_STALE_MS = 2 * 60 * 1000;
+
+async function hasActiveSession(userId: string) {
+  const { data, error } = await supabase
+    .from("active_sessions")
+    .select("session_token,last_seen")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error || !data?.session_token || !data.last_seen) return false;
+
+  const localToken = localStorage.getItem(`${TOKEN_KEY}.${userId}`);
+  const lastSeenMs = new Date(data.last_seen).getTime();
+  return data.session_token !== localToken && Date.now() - lastSeenMs < SESSION_STALE_MS;
+}
 
 export const Route = createFileRoute("/auth")({
   validateSearch: search,
@@ -113,10 +129,13 @@ function LoginForm() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setBusy(false); return toast.error(error.message); }
-    // Kick all other devices/sessions for this account — server-side revocation.
-    try { await supabase.auth.signOut({ scope: "others" }); } catch {}
+    if (data.user && await hasActiveSession(data.user.id)) {
+      await supabase.auth.signOut();
+      setBusy(false);
+      return toast.error("Bu akkaunt boshqa qurilmada ochiq. Avval o‘sha joydan chiqing.");
+    }
     setBusy(false);
     toast.success(t("common.success"));
     // Don't navigate here — AuthPage's useEffect will redirect once `user` is hydrated.

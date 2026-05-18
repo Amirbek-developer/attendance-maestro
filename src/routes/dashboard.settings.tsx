@@ -149,6 +149,7 @@ function SettingsPage() {
   const deleteAccount = useMutation({
     mutationFn: async () => {
       // Soft cleanup: delete user data; auth user removal should be done via admin server fn
+      await supabase.from("active_sessions").delete().eq("user_id", user!.id);
       await supabase.from("attendance_records").delete().eq("user_id", user!.id);
       await supabase.from("reward_records").delete().eq("user_id", user!.id);
       await supabase.from("students").delete().eq("user_id", user!.id);
