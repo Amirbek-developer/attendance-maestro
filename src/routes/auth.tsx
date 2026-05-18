@@ -114,8 +114,10 @@ function LoginForm() {
     e.preventDefault();
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) { setBusy(false); return toast.error(error.message); }
+    // Kick all other devices/sessions for this account — server-side revocation.
+    try { await supabase.auth.signOut({ scope: "others" }); } catch {}
     setBusy(false);
-    if (error) return toast.error(error.message);
     toast.success(t("common.success"));
     // Don't navigate here — AuthPage's useEffect will redirect once `user` is hydrated.
   };
